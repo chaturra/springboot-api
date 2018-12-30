@@ -1,0 +1,57 @@
+1: build the image
+
+docker build -f Dockerfile -t docker-course-api .
+
+2: run the image
+
+docker run -p 8081:8081 docker-course-api
+
+3: run the image on kubernetes
+
+a: enable kubernetes on docker settings
+
+b:create deployment.yml in the project directory
+
+sample yml:
+----------------------------------------------------------------------------
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: springservice
+spec:
+  selector:
+    app: course-api
+  ports:
+    - protocol: "TCP"
+      port: 8081
+      targetPort: 8081
+      nodePort: 30001
+  type: LoadBalancer
+
+
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: springappdeployment
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: course-api
+    spec:
+      containers:
+        - name: course-api
+          image: docker-course-api
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8081               
+----------------------------------------------------------------------------------------------------------
+c: run below command
+kubectl apply -f Deployment.yml
+kubectl get pods
+kubectl get deployments
+kubectl get service
